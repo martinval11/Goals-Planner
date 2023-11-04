@@ -28,18 +28,48 @@ const darkTheme = createTheme({
 export default function Home() {
   const [goals, setGoals] = useState([]);
   const [openAddGoal, setOpenAddGoal] = useState(false);
-  const [openInfoGoal, setOpenInfoGoal] = useState(false);
-
-  const openGoalInfoModal = () => {
-    setOpenInfoGoal(true);
-  };
-
-  const closeGoalInfoModal = () => {
-    setOpenInfoGoal(false);
-  };
 
   const openGoalModal = () => {
     setOpenAddGoal(true);
+  };
+
+  const GoalCard = ({ goal }: any) => {
+    const [openInfoGoal, setOpenInfoGoal] = useState(false);
+
+    const openGoalInfoModal = () => {
+      setOpenInfoGoal(true);
+    };
+    
+    const closeGoalInfoModal = () => {
+      setOpenInfoGoal(false);
+    };
+    
+    return (
+      <>
+        <Card
+          key={goal.name}
+          onClick={openGoalInfoModal}
+          sx={{ cursor: 'pointer', width: '300px' }}
+        >
+          <CardContent>
+            <Typography variant="h5" component="div">
+              {goal.name}
+            </Typography>
+            <Typography sx={{ fontSize: 14 }} gutterBottom>
+              {daysLeft(goal.date)}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        {openInfoGoal && (
+          <GoalInfoModal
+            goal={goal}
+            openState={openGoalInfoModal}
+            closeState={closeGoalInfoModal}
+          />
+        )}
+      </>
+    );
   };
 
   useEffect(() => {
@@ -54,32 +84,11 @@ export default function Home() {
       <Box p={2}>
         <h1>My Goals</h1>
 
-        {goals.map((goal: any) => (
-          <>
-            <Card
-              key={goal.name}
-              onClick={openGoalInfoModal}
-              sx={{ cursor: 'pointer' }}
-            >
-              <CardContent>
-                <Typography variant="h5" component="div">
-                  {goal.name}
-                </Typography>
-                <Typography sx={{ fontSize: 14 }} gutterBottom>
-                  {daysLeft(goal.date)}
-                </Typography>
-              </CardContent>
-            </Card>
-
-            {openInfoGoal && (
-              <GoalInfoModal
-                goal={goal}
-                openState={openGoalInfoModal}
-                closeState={closeGoalInfoModal}
-              />
-            )}
-          </>
-        ))}
+        <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
+          {goals.map((goal: any) => (
+            <GoalCard goal={goal} key={goal.name} />
+          ))}
+        </Box>
 
         <Fab
           color="primary"
@@ -94,7 +103,13 @@ export default function Home() {
           <AddIcon />
         </Fab>
 
-        {openAddGoal && <GoalCreateModal openState={setOpenAddGoal} setGoalsData={setGoals} goalsData={goals} />}
+        {openAddGoal && (
+          <GoalCreateModal
+            openState={setOpenAddGoal}
+            setGoalsData={setGoals}
+            goalsData={goals}
+          />
+        )}
       </Box>
     </ThemeProvider>
   );
