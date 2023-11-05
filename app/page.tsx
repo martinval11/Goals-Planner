@@ -39,11 +39,11 @@ export default function Home() {
     const openGoalInfoModal = () => {
       setOpenInfoGoal(true);
     };
-    
+
     const closeGoalInfoModal = () => {
       setOpenInfoGoal(false);
     };
-    
+
     return (
       <>
         <Card
@@ -74,7 +74,9 @@ export default function Home() {
 
   useEffect(() => {
     const data = localStorage.getItem('data');
-    setGoals(JSON.parse(data || '{}'));
+    if (data !== null) {
+      setGoals(JSON.parse(data));
+    }
   }, []);
 
   return (
@@ -85,9 +87,11 @@ export default function Home() {
         <h1>My Goals</h1>
 
         <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
-          {goals.map((goal: any) => (
-            <GoalCard goal={goal} key={goal.name} />
-          ))}
+          {!goals?.length ? (
+            <h3>No goals</h3>
+          ) : (
+            goals.map((goal: any) => <GoalCard goal={goal} key={goal.name} />)
+          )}
         </Box>
 
         <Fab

@@ -34,6 +34,8 @@ const GoalCreateModal = ({ openState, setGoalsData, goalsData }: any) => {
       reward: reward.current?.value,
       date: date.current?.value,
       category: category,
+      steps: [],
+      notes: [],
     };
 
     localStorage.setItem('data', JSON.stringify([...goalsData, data]));

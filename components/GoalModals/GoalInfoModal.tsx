@@ -11,7 +11,7 @@ import {
   Checkbox,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -55,11 +55,23 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
     setValue(newValue);
   };
 
-  const ControlledCheckbox = ({ label }: any) => {
-    const [checked, setChecked] = useState(true);
+  const ControlledCheckbox = ({ label, checkedStep }: any) => {
+    const [checked, setChecked] = useState(checkedStep);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setChecked(event.target.checked);
+
+      const localData = localStorage.getItem('data') ?? '';
+      const data = JSON.parse(localData);
+
+      const goalIndex = data.findIndex(
+        (goalData: any) => goalData.name === goal.name
+      );
+      const stepIndex = steps.findIndex((step: any) => step.name === label);
+
+      data.at(goalIndex).steps.at(stepIndex).done = event.target.checked;
+
+      localStorage.setItem('data', JSON.stringify(data));
     };
 
     return (
@@ -74,18 +86,60 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
         }
       />
     );
-  }
+  };
 
   const addStep = () => {
     const stepName = prompt('Enter new step name');
-    setSteps([...steps, stepName]);
+
+    if (stepName) {
+      goal.steps = [...steps, { name: stepName, done: false }];
+
+      const localData = localStorage.getItem('data') ?? '';
+      const data = JSON.parse(localData);
+
+      const goalIndex = data.findIndex(
+        (goalData: any) => goalData.name === goal.name
+      );
+
+      data.at(goalIndex).steps = goal.steps;
+      localStorage.setItem('data', JSON.stringify(data));
+
+      return setSteps([...steps, { name: stepName, done: false }]);
+    }
+    return null;
   };
 
   const addNote = () => {
     const note = prompt('Type here your note');
-    setNotes([...notes, note]);
-    console.log(notes);
+
+    if (note) {
+      const localData = localStorage.getItem('data') ?? '';
+      const data = JSON.parse(localData);
+
+      const goalIndex = data.findIndex(
+        (goalData: any) => goalData.name === goal.name
+      );
+
+      data.at(goalIndex).notes = [...notes, note];
+      console.log(data.at(goalIndex).notes);
+      localStorage.setItem('data', JSON.stringify(data));
+
+      return setNotes([...notes, note]);
+    }
+    return null;
   };
+
+  useEffect(() => {
+    const localData = localStorage.getItem('data') ?? '';
+    const data = JSON.parse(localData);
+
+    const goalIndex = data.findIndex(
+      (goalData: any) => goalData.name === goal.name
+    );
+
+    setSteps(data.at(goalIndex).steps);
+    setNotes(data.at(goalIndex).notes);
+  }, []);
 
   return (
     <Dialog open={openState} onClose={closeState} fullWidth>
@@ -111,13 +165,17 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
 
           <p>Category: {goal.category}</p>
         </CustomTabPanel>
-        <CustomTabPanel value={value} index={1} sx={{ position: 'relative' }}>
+        <CustomTabPanel value={value} index={1}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             {steps.length === 0 ? (
               <span>No steps</span>
             ) : (
               steps.map((step: string, index: number) => (
-                <ControlledCheckbox key={index} label={step} />
+                <ControlledCheckbox
+                  key={index}
+                  label={step.name}
+                  checkedStep={step.done}
+                />
               ))
             )}
           </Box>
@@ -135,8 +193,8 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
             <AddIcon />
           </Fab>
         </CustomTabPanel>
-        <CustomTabPanel value={value} index={2} sx={{ position: 'relative' }}>
-          {steps.length === 0 ? (
+        <CustomTabPanel value={value} index={2}>
+          {notes.length === 0 ? (
             <span>No notes</span>
           ) : (
             notes.map((note: string, index: number) => (
