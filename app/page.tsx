@@ -8,6 +8,7 @@ import {
   Card,
   CardContent,
   Typography,
+  Button,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -44,20 +45,53 @@ export default function Home() {
       setOpenInfoGoal(false);
     };
 
+    const deleteGoal = (event: any) => {
+      const confirmDeleteGoal = confirm(
+        'Are you sure you want to delete this item?'
+      );
+
+      if (confirmDeleteGoal) {
+        const goalName = event.target.id;
+        const filterGoals = goals.filter((goal: any) => goal.name !== goalName);
+        localStorage.setItem('data', JSON.stringify(filterGoals));
+        return setGoals(filterGoals);
+      }
+      return null;
+    };
+
+    const renameGoal = (event: any) => {
+      const oldGoalName = event.target.id;
+      const newGoalName = prompt('Type your new goal name', oldGoalName);
+
+      if (newGoalName) {
+        const goalIndex = goals.findIndex(
+          (goal: any) => goal.name === oldGoalName
+        );
+        goals.at(goalIndex).name = newGoalName;
+
+        localStorage.setItem('data', JSON.stringify(goals));
+        return setGoals([...goals]);
+      }
+    };
+
     return (
       <>
-        <Card
-          key={goal.name}
-          onClick={openGoalInfoModal}
-          sx={{ cursor: 'pointer', width: '300px' }}
-        >
+        <Card key={goal.name} sx={{ cursor: 'pointer', width: '300px' }}>
           <CardContent>
-            <Typography variant="h5" component="div">
-              {goal.name}
-            </Typography>
-            <Typography sx={{ fontSize: 14 }} gutterBottom>
-              {daysLeft(goal.date)}
-            </Typography>
+            <div onClick={openGoalInfoModal}>
+              <Typography variant="h5" component="div">
+                {goal.name}
+              </Typography>
+              <Typography sx={{ fontSize: 14 }} gutterBottom>
+                {daysLeft(goal.date)}
+              </Typography>
+            </div>
+            <Button onClick={deleteGoal} id={goal.name}>
+              Delete
+            </Button>
+            <Button onClick={renameGoal} id={goal.name}>
+              Rename
+            </Button>
           </CardContent>
         </Card>
 

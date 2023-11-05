@@ -19,6 +19,11 @@ interface TabPanelProps {
   value: number;
 }
 
+interface Step {
+  name: string;
+  done: boolean;
+}
+
 export default function GoalInfoModal({ goal, openState, closeState }: any) {
   const [steps, setSteps]: any = useState([]);
   const [notes, setNotes]: any = useState([]);
@@ -67,7 +72,7 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
       const goalIndex = data.findIndex(
         (goalData: any) => goalData.name === goal.name
       );
-      const stepIndex = steps.findIndex((step: any) => step.name === label);
+      const stepIndex = steps.findIndex((step: Step) => step.name === label);
 
       data.at(goalIndex).steps.at(stepIndex).done = event.target.checked;
 
@@ -170,7 +175,7 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
             {steps.length === 0 ? (
               <span>No steps</span>
             ) : (
-              steps.map((step: string, index: number) => (
+              steps.map((step: Step, index: number) => (
                 <ControlledCheckbox
                   key={index}
                   label={step.name}
