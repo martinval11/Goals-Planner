@@ -29,14 +29,22 @@ const GoalCreateModal = ({ openState, setGoalsData, goalsData }: any) => {
 
   const addGoal = () => {
     const data = {
-      name: name.current?.value,
-      motivation: motivation.current?.value,
-      reward: reward.current?.value,
-      date: date.current?.value,
-      category: category,
+      name: name.current?.value ?? 'Untitled',
+      motivation: motivation.current?.value ?? '',
+      reward: reward.current?.value ?? '',
+      date: date.current?.value ?? '0000-00-00',
+      category: category ?? '',
       steps: [],
       notes: [],
     };
+
+    const goalExist = goalsData.find(
+      (goal: any) => goal.name === name.current?.value
+    );
+
+    if (goalExist) {
+      return alert('This goal already exists!');
+    }
 
     localStorage.setItem('data', JSON.stringify([...goalsData, data]));
     setGoalsData([...goalsData, data]);
