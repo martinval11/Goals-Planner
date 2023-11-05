@@ -27,7 +27,7 @@ const darkTheme = createTheme({
 });
 
 export default function Home() {
-  const [goals, setGoals] = useState([]);
+  const [goals, setGoals]: any = useState([]);
   const [openAddGoal, setOpenAddGoal] = useState(false);
 
   const openGoalModal = () => {
