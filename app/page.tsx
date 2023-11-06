@@ -9,6 +9,8 @@ import {
   CardContent,
   Typography,
   Button,
+  LinearProgress,
+  LinearProgressProps,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -74,6 +76,30 @@ export default function Home() {
       }
     };
 
+    const LinearProgressWithLabel = (
+      props: LinearProgressProps & { value: number }
+    ) => {
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ width: '100%', mr: 1 }}>
+            <LinearProgress variant="determinate" {...props} />
+          </Box>
+          <Box sx={{ minWidth: 35 }}>
+            <Typography variant="body2" color="text.secondary">{`${Math.round(
+              props.value
+            )}%`}</Typography>
+          </Box>
+        </Box>
+      );
+    };
+
+    const calculatePercentageCompletedSteps = () => {
+      const steps = goal.steps;
+      const uncompletedSteps = steps.filter((step: any) => step.done !== true);
+      const percentage = (100 / (uncompletedSteps.length + 1)).toString();
+      return parseInt(percentage);
+    };
+
     return (
       <>
         <Card key={goal.name} sx={{ cursor: 'pointer', width: '300px' }}>
@@ -85,6 +111,9 @@ export default function Home() {
               <Typography sx={{ fontSize: 14 }} gutterBottom>
                 {daysLeft(goal.date)}
               </Typography>
+              <LinearProgressWithLabel
+                value={calculatePercentageCompletedSteps()}
+              />
             </div>
             <Button onClick={deleteGoal} id={goal.name}>
               Delete
@@ -106,11 +135,32 @@ export default function Home() {
     );
   };
 
+  //useEffect(() => {
+  //  const data = localStorage.getItem('data');
+//
+  //  if (data !== null) {
+  //    setGoals(JSON.parse(data));
+  //  }
+  //}, []);
+
   useEffect(() => {
     const data = localStorage.getItem('data');
-    if (data !== null) {
-      setGoals(JSON.parse(data));
-    }
+    console.log(data)
+
+    // Manejar cambios en localStorage
+    const handleLocalStorageChange = () => {
+      if (data) {
+        setGoals(JSON.parse(data));
+      }
+    };
+
+    // Agregar el evento de escucha para cambios en localStorage
+    window.addEventListener('storage', handleLocalStorageChange);
+
+    return () => {
+      // Eliminar el evento de escucha al desmontar el componente
+      window.removeEventListener('storage', handleLocalStorageChange);
+    };
   }, []);
 
   return (
