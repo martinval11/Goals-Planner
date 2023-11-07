@@ -96,6 +96,19 @@ export default function Home() {
     const calculatePercentageCompletedSteps = () => {
       const steps = goal.steps;
       const uncompletedSteps = steps.filter((step: any) => step.done !== true);
+      const completedSteps = steps.filter((step: any) => step.done === true);
+
+      if (
+        (uncompletedSteps.length === 0 && completedSteps.length === 0) ||
+        (uncompletedSteps.length === 1 && completedSteps.length === 0)
+      ) {
+        return 0;
+      }
+
+      if (uncompletedSteps.length > completedSteps.length && completedSteps.length === 0) {
+        return 0;
+      }
+
       const percentage = (100 / (uncompletedSteps.length + 1)).toString();
       return parseInt(percentage);
     };
@@ -129,38 +142,19 @@ export default function Home() {
             goal={goal}
             openState={openGoalInfoModal}
             closeState={closeGoalInfoModal}
+            changeData={setGoals}
           />
         )}
       </>
     );
   };
 
-  //useEffect(() => {
-  //  const data = localStorage.getItem('data');
-//
-  //  if (data !== null) {
-  //    setGoals(JSON.parse(data));
-  //  }
-  //}, []);
-
   useEffect(() => {
     const data = localStorage.getItem('data');
-    console.log(data)
 
-    // Manejar cambios en localStorage
-    const handleLocalStorageChange = () => {
-      if (data) {
-        setGoals(JSON.parse(data));
-      }
-    };
-
-    // Agregar el evento de escucha para cambios en localStorage
-    window.addEventListener('storage', handleLocalStorageChange);
-
-    return () => {
-      // Eliminar el evento de escucha al desmontar el componente
-      window.removeEventListener('storage', handleLocalStorageChange);
-    };
+    if (data !== null) {
+      setGoals(JSON.parse(data));
+    }
   }, []);
 
   return (

@@ -24,9 +24,15 @@ interface Step {
   done: boolean;
 }
 
-export default function GoalInfoModal({ goal, openState, closeState }: any) {
+export default function GoalInfoModal({
+  goal,
+  openState,
+  closeState,
+  changeData,
+}: any) {
   const [steps, setSteps]: any = useState([]);
   const [notes, setNotes]: any = useState([]);
+  const [dataStored, setDataStored]: any = useState([]);
   const [value, setValue] = useState(0);
 
   const CustomTabPanel = (props: TabPanelProps) => {
@@ -126,7 +132,6 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
       );
 
       data.at(goalIndex).notes = [...notes, note];
-      console.log(data.at(goalIndex).notes);
       localStorage.setItem('data', JSON.stringify(data));
 
       return setNotes([...notes, note]);
@@ -147,7 +152,16 @@ export default function GoalInfoModal({ goal, openState, closeState }: any) {
   }, []);
 
   return (
-    <Dialog open={openState} onClose={closeState} fullWidth>
+    <Dialog
+      open={openState}
+      onClose={() => {
+        closeState();
+        const localData = localStorage.getItem('data') ?? '';
+        const data = JSON.parse(localData);
+        changeData(data);
+      }}
+      fullWidth
+    >
       <DialogTitle>{goal.name}</DialogTitle>
       <DialogContent>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
